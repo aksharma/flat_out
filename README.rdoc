@@ -1,6 +1,203 @@
 = flat_out
 
-Description goes here.
+Create fixed length records with fixed length data fields to write a flat file.
+
+== Install
+
+Install flat_out like any other ruby gem:
+
+    gem install flat_out
+
+== Overview of usage
+
+  flat_out creates a fixed length record with desired formatting of variable fields.
+  It was created to export a fixed length format file to send to an organization
+  using legacy computers and softwares.
+
+  * Create a new FlatOut object of desired length using FlatOut.new.
+  * Format this instance using various put methods based upon your input type.
+  * The final result is available via the to_s method of the object.
+
+== Commands
+
+Available Commands:
+
+  initialize(rec_length)
+  reset
+  reset(rec_length)
+  put_alpha(len, pos, fld)
+  put_integer(len, pos, fld)
+  put_integer_part(len, pos, fld)
+  put_digits_only(len, pos, fld)
+  put_decimal_with_point(int_dot_dec, pos, fld)
+  put_decimal_no_point(int_dot_dec, pos, fld)
+  to_s
+
+
+== IMPORTANT NOTE
+
+The positions specified in flat_out are 1 based, which is what most flat file specifications
+use, and not Ruby's zero based. For example, the first, second, and third characters in a ruby string
+are considered positions 0, 1, and 2 respectively. In flat_out, these would be considered
+positions 1, 2, and 3 respectively.
+
+Command:
+
+  FlatOut.new(length)
+
+  Description:
+    This command will create a blank string of specified length.
+    example:
+      myline = FlatOut.new(80)             # initializes an 80 character blank string in myline.
+
+Command:
+
+  myline.reset
+  myline.reset(new_length)
+
+  Description:
+    This command will blank out the string in the myline object. If no length is provided, the string's
+    length remains unchanged. You can change the length of the string in myline by specifying it here.
+
+    example:
+      myline = FlatOut.new(80)             # initializes an 80 character blank string in myline.
+      myline.reset                         # re-initializes an 80 character blank string in myline.
+      myline.reset(132)                    # myline now has a 132 character blank string.
+
+Command:
+
+  myline.put_alpha(len, pos, fld)
+
+  Description:
+    This command puts the provided string(fld) at starting position(pos) for (len) bytes.
+    If the fld is shorter than specified len, it is padded with trailing spaces.
+    If the fld is longer than specified len, it is left justified and truncated.
+
+  example:
+    myline = FlatOut.new(10)                # '          '
+                                            # '1234567890'
+    myline.put_alpha(4, 2, 'ABCD')          # ' ABCD     '
+    myline.put_alpha(4, 2, 'AB')            # ' AB       '
+    myline.put_alpha(4, 2, 'ABCDEFG')       # ' ABCD     '
+
+Command:
+
+  myline.put_integer(len, pos, fld)
+
+  Description:
+    This command puts the provided integer(fld) at starting position(pos) for (len) bytes.
+    If the fld is shorter than specified len, it is padded with leading zeroes.
+    If the fld is longer than specified len, it is right justified and truncated.
+
+  example:
+    myline = FlatOut.new(10)                # '          '
+                                            # '1234567890'
+    myline.put_integer(4, 2, 1234)          # ' 1234     '
+    myline.put_integer(4, 2, 12)            # ' 0012     '
+    myline.put_integer(4, 2, 123456)        # ' 3456     '
+
+Command:
+
+  myline.put_integer_part(len, pos, fld)
+
+  Description:
+    This command puts the provided integer part only of the provided float(fld)
+    at starting position(pos) for (len) bytes. The decimal part is dropped.
+    It is useful when only the dollar part of an amount is to be reported.
+    If the fld is shorter than specified len, it is padded with leading zeroes.
+    If the fld is longer than specified len, it is right justified and truncated.
+
+  example:
+    myline = FlatOut.new(10)                     # '          '
+                                                 # '1234567890'
+    myline.put_integer_part(4, 2, 1234.45)       # ' 1234     '
+    myline.put_integer_part(4, 2, 12.45)         # ' 0012     '
+    myline.put_integer_part(4, 2, 123456.45)     # ' 3456     '
+
+Command:
+
+  myline.put_digits_only(len, pos, fld)
+
+  Description:
+    This command puts the provided numeric digits only from alphanumeric(fld) at
+    starting position(pos) for (len) bytes. It is useful to convert formatted
+    SSNs, EINs, Phone numbers etc to their numeric only equivalents.
+    If the fld is shorter than specified len, it is padded with trailing spaces.
+    If the fld is longer than specified len, it is left justified and truncated.
+
+  example:
+    myline = FlatOut.new(12)                            # '            '
+                                                        # '123456789012'
+    myline.put_digits_only(10, 2, '012-345-6789')       # ' 0123456789 '
+    myline.put_digits_only(10, 2, '(800) 555-1212')     # ' 8005551212 '
+
+Command:
+
+  myline.put_decimal_with_point(int_dot_dec, pos, fld)
+
+  Description:
+    This command puts the provided decimal number(fld) at starting position(pos).
+    The format of the output has be specified in x.y format where x is the number of integer
+    digits and y is the number of places after the decimal. The total length of this field
+    in the output is going to be x + y + 1.
+    If the fld is shorter than specified length, it is padded with leading and trailing zeroes.
+    If the fld is longer than specified length, it is decimal justified and truncated.
+
+  example:
+    myline = FlatOut.new(12)                             # '            '
+                                                         # '123456789012'
+    myline.put_decimal_with_point(4.2, 2, 1234.56)       # ' 1234.56    '
+    myline.put_decimal_with_point(4.2, 2, 12.3)          # ' 0012.30    '
+    myline.put_decimal_with_point(4.2, 2, 123456.789)    # ' 3456.79    '
+
+Command:
+
+  myline.put_decimal_no_point(int_dot_dec, pos, fld)
+
+  Description:
+    This command puts the provided decimal number(fld) without the decimal at starting position(pos).
+    The format of the output has be specified in x.y format where x is the number of integer
+    digits and y is the number of places after the decimal. The total length of this field
+    in the output is going to be x + y.
+    This is the format used for decimal numbers by most legacy systems using fixed length records.
+    If the fld is shorter than specified length, it is padded with leading and trailing zeroes.
+    If the fld is longer than specified length, it is decimal justified and truncated.
+
+  example:
+    myline = FlatOut.new(12)                             # '            '
+                                                         # '123456789012'
+    myline.put_decimal_no_point(4.2, 2, 1234.56)         # ' 123456     '
+    myline.put_decimal_no_point(4.2, 2, 12.3)            # ' 001230     '
+    myline.put_decimal_no_point(4.2, 2, 123456.789)      # ' 345679     '
+
+Command:
+
+  myline.to_s
+
+  Description:
+    This will return the formatted fixed length record which you can write to a file.
+
+  full cycle example:
+
+    myline = FlatOut.new(80)
+    myline.put_alpha(10, 1, Time.now.strftime("%m/%d/%Y"))
+    myline.put_alpha(30, 30, "TEST REPORT PRINTED")
+    myline.put_alpha(6, 70, "PAGE:")
+    myline.put_integer(2, 79, 1)
+    puts myline.to_s
+
+    users = %w[Anil Mark Jake]
+
+    users.each do |user|
+      myline.reset
+      myline.put_alpha(12, 4, "USERNAME :")
+      myline.put_alpha(12, 16, user)
+      puts myline.to_s
+    end
+
+    myline.reset
+    myline.put_alpha(30, 30, "END OF REPORT")
+    puts myline.to_s
 
 == Contributing to flat_out
  
@@ -14,6 +211,5 @@ Description goes here.
 
 == Copyright
 
-Copyright (c) 2012 Anil Sharma. See LICENSE.txt for
-further details.
+Copyright (c) 2012 Anil Sharma. See LICENSE for further details.
 
