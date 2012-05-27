@@ -10,5 +10,6 @@ group :development do
   gem "rdoc", "~> 3.12"
   gem "bundler", "~> 1.0.0"
   gem "jeweler", "~> 1.8.3"
-  gem "rcov", ">= 0"
+  gem "simplecov", ">= 0.5"
+  gem "ZenTest", "4.4.2"
 end
