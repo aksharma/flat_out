@@ -1,11 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-#describe "FlatOut" do
-#  it "fails" do
-##    fail "hey buddy, you should probably rename this file and start specing for real"
-#  end
-#end
-
 describe "New String" do
   it "should have a blank string of correct length when initialize()" do
     f = FlatOut.new(6)
@@ -29,115 +23,133 @@ describe "Reset String with argument" do
   end
 end
 
-describe "put_alpha exact length" do
+describe "put exact length alpha" do
   it "should replace the correct space in the right spot" do
     f = FlatOut.new(6)
-    f.put_alpha(3,2,"ABC")
+    f.put(3,2,"ABC")
     f.to_s.should == " ABC  "
   end
 end
 
-describe "put_alpha short length" do
+describe "put short length alpha" do
   it "should blank fill the trailing space" do
     f = FlatOut.new(6)
-    f.put_alpha(3,2,"AB")
+    f.put(3,2,"AB")
     f.to_s.should == " AB   "
   end
 end
 
-describe "put_alpha long length" do
+describe "put long length alpha" do
   it "should truncate the extra characters on the right" do
     f = FlatOut.new(6)
-    f.put_alpha(3,2,"ABCDE")
+    f.put(3,2,"ABCDE")
     f.to_s.should == " ABC  "
   end
 end
 
-describe "put_integer exact length" do
-  it "should replace the correct space in the right spot" do
+describe "put exact length integer with default base 1" do
+  it "should replace the correct space in the right spot using base 1" do
     f = FlatOut.new(6)
-    f.put_integer(3,2,123)
+    f.put(3,2,123)
     f.to_s.should == " 123  "
   end
 end
 
-describe "put_integer short length" do
+describe "put exact length integer with base 0" do
+  it "should replace the correct space in the right spot using base 0" do
+    FlatOut.base(0)
+    f = FlatOut.new(6)
+    f.put(3,2,123)
+    f.to_s.should == "  123 "
+    FlatOut.base(1)
+  end
+end
+
+describe "put short length integer" do
   it "should zero fill the leading spaces" do
     f = FlatOut.new(6)
-    f.put_integer(3,2,12)
+    f.put(3,2,12)
     f.to_s.should == " 012  "
   end
 end
 
-describe "put_integer long length" do
-  it "should truncate the extra characters on the right" do
+describe "put long length integer" do
+  it "should truncate the extra most dignificant digits on left" do
     f = FlatOut.new(6)
-    f.put_integer(3,2,12345)
+    f.put(3,2,12345)
     f.to_s.should == " 345  "
   end
 end
 
-describe "put_digits_only" do
-  it "should remove non-digit characters" do
-    f = FlatOut.new(11)
-    f.put_digits_only(9,2,'01(2)-3ABC4-5^678')
-    f.to_s.should == " 012345678 "
-  end
-end
-
-describe "put_integer_part of an integer" do
-  it "should act like put_integer" do
+describe "put float with short length integer only" do
+  it "should remove the decimal part and truncate the left digits" do
     f = FlatOut.new(6)
-    f.put_integer_part(3,2,12345)
+    f.put(3,2,12345.67)
     f.to_s.should == " 345  "
   end
 end
 
-describe "put_integer_part of a float" do
-  it "should remove the decimal part" do
-    f = FlatOut.new(6)
-    f.put_integer_part(3,2,12345.67)
-    f.to_s.should == " 345  "
-  end
-end
-
-describe "put_decimal_with_point for a float" do
+describe "put float with decimal part and full length" do
   it "should include the decimal in result for exact size" do
     f = FlatOut.new(12)
-    f.put_decimal_with_point(5.3, 2, 12345.678)
+    f.put(5.3, 2, 12345.678)
     f.to_s.should == " 12345.678  "
   end
 end
 
-describe "put_decimal_with_point for a float" do
+describe "put float with decimal part with shorter length on both ends" do
   it "should truncate the result for smaller size" do
     f = FlatOut.new(12)
-    f.put_decimal_with_point(4.2, 2, 12345.643)
+    f.put(4.2, 2, 12345.643)
     f.to_s.should == " 2345.64    "
   end
 end
 
-describe "put_decimal_with_point for a float" do
+describe "put float with decimal part with shorter length on both ends with rounding" do
   it "should truncate the result for smaller size(rounded)" do
     f = FlatOut.new(12)
-    f.put_decimal_with_point(4.2, 2, 12345.678)
+    f.put(4.2, 2, 12345.678)
     f.to_s.should == " 2345.68    "
   end
 end
 
-describe "put_decimal_with_point for a float" do
+describe "put float with longer length on both ends" do
   it "should zero fill both sides" do
     f = FlatOut.new(12)
-    f.put_decimal_with_point(4.2, 2, 1.2)
+    f.put(4.2, 2, 1.2)
     f.to_s.should == " 0001.20    "
   end
 end
 
-describe "put_decimal_no_point for a float" do
+describe "put float with negative length" do
   it "should not have a decimal" do
     f = FlatOut.new(12)
-    f.put_decimal_no_point(4.2, 2, 1.2)
+    f.put(-4.2, 2, 1.2)
     f.to_s.should == " 000120     "
+  end
+end
+
+describe "digits_only" do
+  it "should remove non-digit characters" do
+    FlatOut.digits_only('01(2)-3ABC4-5^678').should == "012345678"
+  end
+end
+
+describe "phone_squeeze" do
+  it "should remove phone punctuation characters" do
+    FlatOut.phone_squeeze('(800) 555-1212').should == "8005551212"
+  end
+end
+
+describe "phone_squeeze" do
+  it "should remove phone punctuation characters and maintain extensions" do
+    FlatOut.phone_squeeze('(800) 555-1212 Ext 234').should == "8005551212Ext234"
+  end
+end
+
+describe "phone_squeeze" do
+  it "should remove phone punctuation characters and maintain extensions" do
+    FlatOut.phone_squeeze('(800) GOT-MILK').should == "800GOTMILK"
   end
 end
 
