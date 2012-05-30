@@ -36,19 +36,11 @@ Available Commands:
   to_s
 
   reset
+  reset(rec_length)
   reset(rec_length, options)
 
   FlatOut.digits_only(fld)
   FlatOut.phone_squeeze(fld)
-
-Command:
-
-
-
-    example:
-      FlatOut.base(0)                 # Set the base to zero.
-      FlatOut.base(1)                 # Set the base to 1(default).
-
 
 Command:
 
