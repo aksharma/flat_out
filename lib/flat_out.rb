@@ -1,21 +1,17 @@
 class FlatOut
-  def initialize(rec_length)
-    @flat_out = " " * rec_length
-    @flat_length = rec_length
-    @@base ||= 1
+  def initialize(rec_length, options={})
+    self.reset(rec_length, options)
   end
 
-  def reset(rec_length=@flat_length)
+  def reset(rec_length=@flat_length, options={})
     @flat_out = " " * rec_length
     @flat_length = rec_length
+    @base = options[:base] ||= @base ||= 1
+    @format = options[:format] ||= @format ||= :len_pos_fld
   end
 
   def to_s
     @flat_out
-  end
-
-  def self.base(base)
-    @@base = base
   end
 
   def self.phone_squeeze(fld)
@@ -26,7 +22,16 @@ class FlatOut
     fld.gsub(/[^\d]/,"")
   end
 
-  def put len, pos, fld
+  def put p1, p2, p3
+    case @format
+    when :len_pos_fld then (len = p1; pos = p2; fld = p3)
+    when :len_fld_pos then (len = p1; fld = p2; pos = p3)
+    when :pos_len_fld then (pos = p1; len = p2; fld = p3)
+    when :pos_fld_len then (pos = p1; fld = p2; len = p3)
+    when :fld_pos_len then (fld = p1; pos = p2; len = p3)
+    when :fld_len_pos then (fld = p1; len = p2; pos = p3)
+    end
+
     case fld
     when String
       put_alpha len, pos, fld
@@ -44,7 +49,7 @@ class FlatOut
   private
 
   def put_fld len, pos, fld
-    start_pos = pos - @@base ; end_pos = start_pos + len
+    start_pos = pos - @base ; end_pos = start_pos + len
     @flat_out[start_pos...end_pos] = fld
   end
 

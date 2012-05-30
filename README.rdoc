@@ -25,30 +25,25 @@ Install flat_out like any other ruby gem:
     positions 0, 1, and 2 respectively. In flat_out, these would be considered
     positions 1, 2, and 3 respectively.
 
-    You can change the base through the FlatOut.base command.
+    You can change the base by providing an option value when creating the object.
 
 == Commands
 
 Available Commands:
 
-  FlatOut.base(base)
-  FlatOut.new(rec_length)
+  FlatOut.new(rec_length, options)
   put(len, pos, fld)
   to_s
 
   reset
-  reset(rec_length)
+  reset(rec_length, options)
 
   FlatOut.digits_only(fld)
   FlatOut.phone_squeeze(fld)
 
 Command:
 
-  FlatOut.base(base)
 
-  Description:
-    This command will change the base for position specifications. It is also useful while
-    working with layouts that are specified with an offset.
 
     example:
       FlatOut.base(0)                 # Set the base to zero.
@@ -63,6 +58,17 @@ Command:
     This command will create a blank string of specified length.
     example:
       myline = FlatOut.new(80)             # initializes an 80 character blank string in myline.
+
+    Optionally, you can provide a base. This will change the base for position specifications.
+    It is also useful while working with layouts that are specified with an offset.
+    example:
+      myline = FlatOut.new(80, :base => 0)             # Set the base to zero.
+      myline = FlatOut.new(80, :base => 1)             # Set the base to 1(default).
+
+    You can also change the order of the input parameters for the put statement.
+    All six combinations of len, pos, fld are available.
+    example:
+      myline = FlatOut.new(80, :base => 0, :format => :fld_len_pos) # default is :len_pos_fld
 
 Command:
 

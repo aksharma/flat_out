@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'flat_out'
-  s.version     = '0.0.3'
-  s.date        = '2012-05-28'
+  s.version     = '0.0.4'
+  s.date        = '2012-05-29'
   s.summary     = "Create fixed length records to write to a flat file."
   s.description = "Create fixed length records with fixed length data fields to write a flat file."
   s.authors     = ["Anil Sharma"]

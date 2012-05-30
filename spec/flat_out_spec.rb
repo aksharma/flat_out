@@ -23,10 +23,27 @@ describe "Reset String with argument" do
   end
 end
 
+describe "reset with different base" do
+  it "should reset to new size with new base" do
+    f = FlatOut.new(6, :base => 2)
+    f.reset(5, :base => 1)
+    f.put(3,2,123)
+    f.to_s.should == " 123 "
+  end
+end
+
 describe "put exact length alpha" do
   it "should replace the correct space in the right spot" do
     f = FlatOut.new(6)
     f.put(3,2,"ABC")
+    f.to_s.should == " ABC  "
+  end
+end
+
+describe "put exact length alpha with fld_pos_len format" do
+  it "should replace the correct space in the right spot" do
+    f = FlatOut.new(6, :format => :fld_pos_len)
+    f.put("ABC",2,3)
     f.to_s.should == " ABC  "
   end
 end
@@ -57,11 +74,9 @@ end
 
 describe "put exact length integer with base 0" do
   it "should replace the correct space in the right spot using base 0" do
-    FlatOut.base(0)
-    f = FlatOut.new(6)
+    f = FlatOut.new(6, :base => 0)
     f.put(3,2,123)
     f.to_s.should == "  123 "
-    FlatOut.base(1)
   end
 end
 
