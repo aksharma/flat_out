@@ -137,6 +137,7 @@ Command:
 
   Description:
     This will return the formatted fixed length record which you can write to a file.
+    It will blank fill or truncate the output to the correct length.
 
 Command:
 
@@ -162,6 +163,16 @@ Command:
     FlatOut.phone_squeeze('(800) 555-1212') == "8005551212"
     FlatOut.phone_squeeze('(800) 555-1212 Ext 234') == "8005551212Ext234"
     FlatOut.phone_squeeze('(800) GOT-MILK') == "800GOTMILK"
+
+== Working with Templates
+
+   You can also specify a template during initialization, and then put values in the template
+   with an array.
+
+  example:
+    f = FlatOut.new(18, :template => [[5,1],[5,6],[4.2,11]])    #  '123456789012345678'
+    val = ['ABCD',10,10.23]
+    f.put(val)                                                  #  'ABCD 000100010.23 '
 
 == Full Cycle Example:
 

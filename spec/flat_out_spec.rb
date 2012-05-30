@@ -144,6 +144,15 @@ describe "put float with negative length" do
   end
 end
 
+describe "put with a template" do
+  it "should put multiple fields" do
+    f = FlatOut.new(18, :template => [[5,1],[5,6],[4.2,11]])
+    val = ['ABCD',10,10.23]
+    f.put(val)
+    f.to_s.should == 'ABCD 000100010.23 '
+  end
+end
+
 describe "digits_only" do
   it "should remove non-digit characters" do
     FlatOut.digits_only('01(2)-3ABC4-5^678').should == "012345678"

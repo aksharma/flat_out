@@ -8,10 +8,11 @@ class FlatOut
     @flat_length = rec_length
     @base = options[:base] ||= @base ||= 1
     @format = options[:format] ||= @format ||= :len_pos_fld
+    @template = options[:template] ||= @template ||= []
   end
 
   def to_s
-    @flat_out
+    (@flat_out + (' ' * @flat_length))[0...@flat_length]
   end
 
   def self.phone_squeeze(fld)
@@ -22,17 +23,28 @@ class FlatOut
     fld.gsub(/[^\d]/,"")
   end
 
-  def put p1, p2, p3
-    case @format
-    when :len_pos_fld then (len = p1; pos = p2; fld = p3)
-    when :len_fld_pos then (len = p1; fld = p2; pos = p3)
-    when :pos_len_fld then (pos = p1; len = p2; fld = p3)
-    when :pos_fld_len then (pos = p1; fld = p2; len = p3)
-    when :fld_pos_len then (fld = p1; pos = p2; len = p3)
-    when :fld_len_pos then (fld = p1; len = p2; pos = p3)
+  def put p1, p2=1, p3=''
+    if @template.size > 0 && p1.class == Array
+      fld = p1
+    else
+      case @format
+      when :len_pos_fld then (len = p1; pos = p2; fld = p3)
+      when :len_fld_pos then (len = p1; fld = p2; pos = p3)
+      when :pos_len_fld then (pos = p1; len = p2; fld = p3)
+      when :pos_fld_len then (pos = p1; fld = p2; len = p3)
+      when :fld_pos_len then (fld = p1; pos = p2; len = p3)
+      when :fld_len_pos then (fld = p1; len = p2; pos = p3)
+      else                   (len = p1; pos = p2; fld = p3)
+      end
     end
 
     case fld
+    when Array
+      fld.each_with_index do |field,idx|
+        len = @template[idx][0]
+        pos = @template[idx][1]
+        put len, pos, field
+      end
     when String
       put_alpha len, pos, fld
     when Integer
