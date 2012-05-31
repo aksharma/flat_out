@@ -1,14 +1,18 @@
 class FlatOut
+
+  #attr_accessor :flat_out, :flat_length, :base, :format, :template
+
   def initialize(rec_length, options={})
     self.reset(rec_length, options)
   end
 
   def reset(rec_length=@flat_length, options={})
-    @flat_out = " " * rec_length
-    @flat_length = rec_length
     @base = options[:base] ||= @base ||= 1
     @format = options[:format] ||= @format ||= :len_pos_fld
     @template = options[:template] ||= @template ||= []
+    @flat_length = rec_length
+    @flat_out = " " * rec_length
+    return @flat_out
   end
 
   def to_s
@@ -34,16 +38,45 @@ class FlatOut
       when :pos_fld_len then (pos = p1; fld = p2; len = p3)
       when :fld_pos_len then (fld = p1; pos = p2; len = p3)
       when :fld_len_pos then (fld = p1; len = p2; pos = p3)
+      when :fld_len     then (fld = p1)
+      when :len_fld     then (fld = p1)
       else                   (len = p1; pos = p2; fld = p3)
       end
     end
 
     case fld
     when Array
-      fld.each_with_index do |field,idx|
-        len = @template[idx][0]
-        pos = @template[idx][1]
-        put len, pos, field
+      if @template.size > 0 and @template[0].class == Array    # :template => [[5,1],[5,6],[4.2,11]]
+        fld.each_with_index do |field,idx|
+          len = @template[idx][0]
+          pos = @template[idx][1]
+          put len, pos, field
+        end
+      elsif @template.size > 0                                 # :template => [5,5,4.2,3]
+        pos = @base
+        fld.each_with_index do |field, idx|
+          len = @template[idx]
+          put len, pos, field
+          pos = pos + real_len(len)
+        end
+      elsif @format == :fld_len                                # val = ['ABCD', 5, 10, 5]
+        @format = :len_pos_fld
+        pos = @base
+        fld.each_slice(2) do |arr|
+          field = arr[0]
+          len = arr[1]
+          put len, pos, field
+          pos = pos + real_len(len)
+        end
+      elsif @format == :len_fld                                # val = [5, 'ABCD', 4.2, 10.23]
+        @format = :len_pos_fld
+        pos = @base
+        fld.each_slice(2) do |arr|
+          len = arr[0]
+          field = arr[1]
+          put len, pos, field
+          pos = pos + real_len(len)
+        end
       end
     when String
       put_alpha len, pos, fld
@@ -56,6 +89,7 @@ class FlatOut
         put_integer len, pos, fld
       end
     end
+    return self.to_s
   end
 
   private
@@ -92,5 +126,17 @@ class FlatOut
     dec = int_dot_dec.to_s.split(".")[1].to_i
     val =  sprintf("%0.#{dec}f", fld)[-dec,dec]
     put_fld dec, pos, val
+  end
+
+  def real_len(len)
+    return len if len.integer?
+
+    int = len.to_s.split(".")[0].to_i.abs
+    dec = len.to_s.split(".")[1].to_i
+    if len > 0
+      return int + 1 + dec
+    else
+      return int + dec
+    end
   end
 end

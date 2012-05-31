@@ -48,6 +48,30 @@ describe "put exact length alpha with fld_pos_len format" do
   end
 end
 
+describe "put whole record specified in an array with fld_len format" do
+  it "should build the format sequentially" do
+    f = FlatOut.new(21, :format => :fld_len)
+    val = ['ABCD', 5,
+            10,    5,
+           10.23,  4.2,
+           'EFG',  3]
+    f.put(val)
+    f.to_s.should == 'ABCD 000100010.23EFG '
+  end
+end
+
+describe "put whole record specified in an array with len_fld format" do
+  it "should build the format sequentially" do
+    f = FlatOut.new(21, :format => :len_fld)
+    val = [5, 'ABCD',
+           5,  10,
+           4.2, 10.23,
+           3, 'EFG']
+    f.put(val)
+    f.to_s.should == 'ABCD 000100010.23EFG '
+  end
+end
+
 describe "put short length alpha" do
   it "should blank fill the trailing space" do
     f = FlatOut.new(6)
@@ -144,12 +168,21 @@ describe "put float with negative length" do
   end
 end
 
-describe "put with a template" do
+describe "put with a template specifying len and pos" do
   it "should put multiple fields" do
     f = FlatOut.new(18, :template => [[5,1],[5,6],[4.2,11]])
     val = ['ABCD',10,10.23]
     f.put(val)
     f.to_s.should == 'ABCD 000100010.23 '
+  end
+end
+
+describe "put with a template specifying len only" do
+  it "should build the format sequentially" do
+    f = FlatOut.new(21, :template => [5,5,4.2,3])
+    val = ['ABCD',10,10.23,'EFG']
+    f.put(val)
+    f.to_s.should == 'ABCD 000100010.23EFG '
   end
 end
 

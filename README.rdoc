@@ -88,7 +88,7 @@ Command:
       If the fld is longer than specified len, it is left justified and truncated.
 
       Example:
-                                              # '123456789012'
+                                                # '123456789012'
         myline = FlatOut.new(12)                # '            '
         myline.put(4, 2, 'ABCDEFG')             # ' ABCD       '
         myline.put(4, 2, 'ABCD')                # ' ABCD       '
@@ -131,13 +131,34 @@ Command:
         myline.put(-4.2, 2, 12.3)               # ' 001230     '
         myline.put(-4.2, 2, 123456.789)         # ' 345679     '
 
+    Entire record in an array:
+      To specify the entire record in a single array, you have to use option :len_fld or :fld_len,
+      and the array should contain the fields in strict sequence. Also see 'Working With Templates'.
+      example 1:
+        myline = FlatOut.new(21, :format => :len_fld)
+        val = [5, 'ABCD',
+               5,  10,
+               4.2, 10.23,
+               3, 'EFG']
+        myline.put(val)                         # 'ABCD 000100010.23EFG '
+
+      example 2:
+        myline = FlatOut.new(21, :format => :fld_len)
+        val = ['ABCD', 5,
+                10,    5,
+               10.23,  4.2,
+               'EFG',  3]
+        myline.put(val)                         # 'ABCD 000100010.23EFG '
+
+
 Command:
 
   myline.to_s
 
   Description:
     This will return the formatted fixed length record which you can write to a file.
-    It will blank fill or truncate the output to the correct length.
+    It will blank fill or truncate the output to the correct length. Reset and put also
+    return myline.to_s.
 
 Command:
 
@@ -167,10 +188,17 @@ Command:
 == Working with Templates
 
    You can also specify a template during initialization, and then put values in the template
-   with an array.
+   with an array. Templates can have length and positions as follows:
 
   example:
     f = FlatOut.new(18, :template => [[5,1],[5,6],[4.2,11]])    #  '123456789012345678'
+    val = ['ABCD',10,10.23]
+    f.put(val)                                                  #  'ABCD 000100010.23 '
+
+   You can also skip the position specification if the fields are specified in strict sequence
+   in the template.
+  example:
+    f = FlatOut.new(18, :template => [5,5,4.2])                 #  '123456789012345678'
     val = ['ABCD',10,10.23]
     f.put(val)                                                  #  'ABCD 000100010.23 '
 
@@ -196,8 +224,15 @@ Command:
     myline.put(30, 30, "END OF REPORT")
     puts myline.to_s
 
+== Issues, Suggestions
+
+* https://github.com/aksharma/flat_out/issues/
+* or email me directly at (sharma.rubyonrails)
+*     this address        (    @             )
+*                         (sharmail_dot_com  )
+
 == Contributing to flat_out
- 
+
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
 * Fork the project.
